@@ -3,6 +3,7 @@ services:
 
   minio-client:
     image: ${DOCKER_MINIO_CLIENT_IMAGE_NAME}
+    container_name: minio-client
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc config host rm local;

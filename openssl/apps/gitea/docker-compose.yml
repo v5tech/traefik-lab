@@ -42,7 +42,7 @@ services:
       - "traefik.http.routers.giteassl.middlewares=gzip@file"
       - "traefik.http.services.giteabackend.loadbalancer.server.scheme=http"
       - "traefik.http.services.giteabackend.loadbalancer.server.port=3000"
-      - "traefik.tcp.routers.giteassh.entrypoints=git"      
+      - "traefik.tcp.routers.giteassh.entrypoints=ssh"
       - "traefik.tcp.routers.giteassh.rule=HostSNI(`*`)"
       - "traefik.tcp.routers.giteassh.tls=true"
       - "traefik.tcp.routers.giteassh.service=gitea"

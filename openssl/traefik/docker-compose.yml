@@ -9,7 +9,7 @@ services:
     command:
       - "--global.sendanonymoususage=false"
       - "--global.checknewversion=false"
-      - "--entrypoints.git.address=:22"
+      - "--entrypoints.ssh.address=:22"
       - "--entrypoints.http.address=:80"
       - "--entrypoints.https.address=:443"
       # - "--entryPoints.http.forwardedHeaders.trustedIPs=127.0.0.1/32,172.18.0.1/24"
