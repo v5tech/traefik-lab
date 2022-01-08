@@ -1,0 +1,42 @@
+version: "3.6"
+
+services:
+
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    environment:
+      # Web 服务监听地址
+      - "DOZZLE_ADDR=0.0.0.0:8080"
+      # Web 服务目录位置
+      - "DOZZLE_BASE=/"
+      # 运行日志打印级别
+      - "DOZZLE_LEVEL=info"
+      # 展示和缓存的日志条数
+      - "DOZZLE_TAILSIZE=300"
+      # 仅展示符合筛选条件的容器
+      # - DOZZLE_FILTER=
+    expose:
+      - "8080"
+    restart: always
+    networks:
+      - "traefik"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.dozzle-web.entrypoints=http"
+      - "traefik.http.routers.dozzle-web.rule=Host(`dozzle.lab.com`)"
+      - "traefik.http.services.dozzle-web-backend.loadbalancer.server.scheme=http"
+      - "traefik.http.services.dozzle-web-backend.loadbalancer.server.port=8080"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+
+networks:
+  traefik:
+    external: true

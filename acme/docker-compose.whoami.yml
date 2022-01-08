@@ -1,0 +1,39 @@
+version: "3.3"
+
+services:
+
+  whoami:
+    image: "traefik/whoami"
+    container_name: "whoami"
+    networks:
+      - "traefik"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+
+      # 中间件 compress、redirectscheme
+      - "traefik.http.middlewares.whoami-gzip.compress=true"
+      - "traefik.http.middlewares.whoami-redirect-https.redirectscheme.scheme=https"
+
+      # http 请求
+      - "traefik.http.routers.whoami-http.entrypoints=http"
+      - "traefik.http.routers.whoami-http.rule=Host(`whoami.example.com`)"
+      - "traefik.http.routers.whoami-http.middlewares=whoami-gzip"
+      # 开启以下中间件将会把http请求重定向到https请求
+      # - "traefik.http.routers.whoami-http.middlewares=whoami-redirect-https"
+      - "traefik.http.routers.whoami-http.service=whoami-backend"
+
+      # https 请求
+      - "traefik.http.routers.whoami-https.entrypoints=https"
+      - "traefik.http.routers.whoami-https.rule=Host(`whoami.example.com`)"
+      - "traefik.http.routers.whoami-https.middlewares=whoami-gzip"
+      - "traefik.http.routers.whoami-https.tls.certresolver=myresolver"
+      - "traefik.http.routers.whoami-https.service=whoami-backend"
+
+      # backend services
+      - "traefik.http.services.whoami-backend.loadbalancer.server.scheme=http"
+      - "traefik.http.services.whoami-backend.loadbalancer.server.port=80"
+
+networks:
+  traefik:
+    external: true
