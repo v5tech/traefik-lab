@@ -11,13 +11,21 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
 
-      # 中间件 compress、redirectscheme
+      # 中间件 compress、redirectscheme、ratelimit
       # - "traefik.http.middlewares.whoami-gzip.compress=true"
       # - "traefik.http.middlewares.whoami-redirect-https.redirectscheme.scheme=https"
+
+      # 限流：1分钟请求10次
+      - "traefik.http.middlewares.whoami-ratelimit.ratelimit.average=10"
+      - "traefik.http.middlewares.whoami-ratelimit.ratelimit.burst=1"
+      - "traefik.http.middlewares.whoami-ratelimit.ratelimit.period=1m"
 
       # http 请求
       - "traefik.http.routers.whoami-http.entrypoints=http"
       - "traefik.http.routers.whoami-http.rule=Host(`whoami.lab.com`)"
+
+      # 开启限流
+      - "traefik.http.routers.whoami-http.middlewares=whoami-ratelimit"
 
       # 开启以下中间件将会把http请求重定向到https请求
       # - "traefik.http.routers.whoami-http.middlewares=whoami-redirect-https"
@@ -27,7 +35,7 @@ services:
       # 开启 compress
       # - "traefik.http.routers.whoami-http.middlewares=whoami-gzip"
       # 或使用config/default.toml中的配置 gzip
-      - "traefik.http.routers.whoami-http.middlewares=gzip@file"      
+      - "traefik.http.routers.whoami-http.middlewares=gzip@file" 
       - "traefik.http.routers.whoami-http.service=whoami-backend"
 
       # https 请求
