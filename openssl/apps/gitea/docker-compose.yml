@@ -3,12 +3,15 @@ version: '3.6'
 services:
 
   gitea:
-    image: gitea/gitea:1.13.2
+    image: gitea/gitea:1.16.8
     container_name: gitea
+    restart: unless-stopped
+    depends_on:
+      - db
     environment:
       - USER_UID=1000
       - USER_GID=1000
-      - APP_NAME=Private
+      - APP_NAME=gitea
       - RUN_MODE=prod
       - RUN_USER=git
       - SSH_DOMAIN=gitea.lab.com
@@ -19,7 +22,7 @@ services:
       - ROOT_URL=https://gitea.lab.com
       - LFS_START_SERVER=false
       - DB_TYPE=mysql
-      - DB_HOST=db
+      - DB_HOST=db:3306
       - DB_NAME=gitea
       - DB_USER=gitea
       - DB_PASSWD=gitea
@@ -29,7 +32,6 @@ services:
     networks:
       - "traefik"
       - "gitea"
-    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
@@ -50,8 +52,7 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "/etc/timezone:/etc/timezone:ro"
-      - "./repositories:/data/git/repositories"
-      - "./data:/data/gitea/"
+      - "giteadata:/data"
     logging:
       driver: "json-file"
       options:
@@ -78,29 +79,16 @@ services:
       MYSQL_PASSWORD: gitea
       TZ: Asia/Shanghai
     volumes:
-      - "./mysql:/var/lib/mysql"
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
+      - "mysqldata:/var/lib/mysql"
     healthcheck:
       test: ["CMD-SHELL", "/etc/init.d/mysql status"]
       interval: 30s
 
-  cache:
-    image: redis:5.0-alpine
-    container_name: redis
-    restart: always
-    networks:
-      - "gitea"
-    expose:
-      - 6379
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-    environment:
-      TZ: Asia/Shanghai
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "/etc/timezone:/etc/timezone:ro"
+volumes:
+  giteadata:
+  mysqldata:
 
+# 首先执行 docker network create traefik
 networks:
   gitea:
     internal: true
