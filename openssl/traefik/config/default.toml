@@ -16,7 +16,7 @@
 # 定义一个简单的 BA 验证
 [http.middlewares.common-auth.basicAuth]
   users = [
-    # htpasswd -nb your-user-name your-pass-word
-    "your-user-name:$shdsdfiuysdiufywiuhreiwhf.",
+    # htpasswd -nb admin 123456
+    "admin:$apr1$69CREdy6$Vurjfaly.stNnXTNndH2e0",
   ]
   removeheader = true
